@@ -1,0 +1,217 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: invoicing
+    version: "1.0"
+  name: invoicing
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: invoicing
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: invoicing
+    spec:
+      containers:
+      - name: invoicing
+        image: microservice-linkerd-invoicing:1
+        imagePullPolicy: Never
+#        livenessProbe:
+#          initialDelaySeconds: 180
+#          httpGet:
+#            path: /actuator/health
+#            port: 8080
+#        readinessProbe:
+#          httpGet:
+#            path: /
+#            port: 8080
+        ports:
+        - containerPort: 8080
+        resources: {}
+status: {}
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: shipping
+    version: "1.0"
+  name: shipping
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: shipping
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: shipping
+    spec:
+      containers:
+      - name: shipping
+        image: microservice-linkerd-shipping:1
+        imagePullPolicy: Never        
+        ports:
+        - containerPort: 8080
+        resources: {}
+status: {}
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: order    
+    version: "1.0"
+  name: order
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: order
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: order
+    spec:
+      containers:
+      - name: order
+        image: microservice-linkerd-order:1
+        imagePullPolicy: Never        
+        ports:
+        - containerPort: 8080
+        resources: {}
+status: {}
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: invoicing
+  name: invoicing
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 8080
+    name: http    
+  selector:
+    app: invoicing
+  type: NodePort
+status:
+  loadBalancer: {}
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: shipping
+  name: shipping
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 8080
+    name: http    
+  selector:
+    app: shipping
+  type: NodePort
+status:
+  loadBalancer: {}
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: order
+    visualize: "true"
+  name: order
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 8080
+    name: http    
+  selector:
+    app: order
+  type: NodePort
+status:
+  loadBalancer: {}
+
+---
+
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: shipping
+  annotations:
+    kubernetes.io/ingress.class: "traefik"
+    ingress.kubernetes.io/custom-request-headers: l5d-dst-override:shipping.default.svc.cluster.local:80
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /shipping
+        backend:
+          serviceName: shipping
+          servicePort: 80
+
+---
+
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: invoicing
+  annotations:
+    kubernetes.io/ingress.class: "traefik"
+    ingress.kubernetes.io/custom-request-headers: l5d-dst-override:invoicing.default.svc.cluster.local:80
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /invoicing
+        backend:
+          serviceName: invoicing
+          servicePort: 80
+
+---
+
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: order
+  annotations:
+    kubernetes.io/ingress.class: "traefik"
+    ingress.kubernetes.io/custom-request-headers: l5d-dst-override:order.default.svc.cluster.local:80
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /order
+        backend:
+          serviceName: order
+          servicePort: 80
