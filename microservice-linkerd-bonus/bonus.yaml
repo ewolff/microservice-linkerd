@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: bonus
+    version: "1.0"
+  name: bonus
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bonus
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: bonus
+    spec:
+      containers:
+      - name: bonus
+        image: microservice-linkerd-bonus:1
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 8080
+        resources: {}
+status: {}
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: bonus
+  name: bonus
+spec:
+  ports:
+  - port: 8080
+    protocol: TCP
+    targetPort: 8080
+    name: http    
+  selector:
+    app: bonus
+  type: NodePort
+status:
+  loadBalancer: {}
+
+---
+
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: order
+  annotations:
+    kubernetes.io/ingress.class: "traefik"
+    ingress.kubernetes.io/custom-request-headers: l5d-dst-override:bonus.default.svc.cluster.local:80
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /bonus
+        backend:
+          serviceName: bonus
+          servicePort: 8080
