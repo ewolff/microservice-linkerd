@@ -552,3 +552,32 @@ service/order` will show that some calls to the service fail.
 
 To remove the fault injection again, just use `kubectl delete -f
 fault-injection.yaml`.
+
+## Retries
+
+Use `kubectl apply -f failing-order-service.yaml` to deploy a version
+of the order microservice that answers 50% of all requests with an
+http status code of 500.  Use `failing-order-service-gcp.yaml` instead
+of `failing-order-service.yaml` if you build and uploaded images to
+Google Cloud. Use `failing-order-service-dockerhub.yaml` if you
+haven't built the Docker container yourself.
+
+If you access the order microservice's web UI or if you make shipping
+and invoicing poll the order microservice, you will likely receive an
+error.
+
+With `kubectl apply -f retry.yaml` you can make linkerd retry requests
+to the order service. The configuration adds retries to the
+communication between the microservices as well as the access through
+the Ingress gateway. So polling and the web UI will both work again.
+
+Linkerd uses a retry budget. It allows for at least 10 retures per
+second but at max 20% additional load due to retries. That way retries
+won't overload the system. Also retries are limit to HTTP GET
+operations. GET is ensured to be idempotent so it is safe to retry
+them. That is different for POSTs.
+
+You can remove the retries with `kubectl delete -f retry.yaml`. The
+failing microservice can be set to normal with `kubectl apply -f
+microservices.yaml`.
+
