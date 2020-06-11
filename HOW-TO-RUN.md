@@ -524,3 +524,10 @@ you can use the URL provided by the command to access Grafana.
 
 You can find information about the deployments in the Linkerd
 Deployment dashboard. 
+
+## Logging
+
+Linkerd support logging of web traffic with its [tap
+feature](https://linkerd.io/2/reference/cli/tap/). For the example,
+you can use e.g. `linkerd tap deploy/order` to log any traffic to the
+order microservice.
