@@ -124,6 +124,11 @@
 			<scope>test</scope>
 		</dependency>
 
+		<dependency>
+			<groupId>io.opentracing.brave</groupId>
+			<artifactId>brave-opentracing</artifactId>
+		</dependency>
+
 	</dependencies>
 
 </project>
