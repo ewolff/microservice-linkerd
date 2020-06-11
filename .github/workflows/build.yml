@@ -21,31 +21,31 @@ jobs:
       run: cd microservice-linkerd-bonus && mvn -B package --file pom.xml
     - name: Create Docker images for bonus microservice
       run: cd microservice-linkerd-bonus && sh ./docker-build.sh
-#    - name: Log into registry
-#      run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
-#    - name: Push image for other microservices
-#      run: |
-#        IMAGE_PREFIX=${{ secrets.DOCKER_USERNAME }}
-#        docker tag microservice-linkerd-bonus:1 $IMAGE_PREFIX/microservice-linkerd-bonus:1
-#        docker push $IMAGE_PREFIX/microservice-linkerd-bonus:1
+    - name: Log into registry
+      run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
+    - name: Push image for other microservices
+      run: |
+        IMAGE_PREFIX=${{ secrets.DOCKER_USERNAME }}
+        docker tag microservice-linkerd-bonus:1 $IMAGE_PREFIX/microservice-linkerd-bonus:1
+        docker push $IMAGE_PREFIX/microservice-linkerd-bonus:1
 
 
     - name: Build other microservices with Maven
       run: cd microservice-linkerd-demo && mvn -B package --file pom.xml
     - name: Create Docker images for other microservicee
       run: cd microservice-linkerd-demo && sh ./docker-build.sh
-#    - name: Log into registry
-#      run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
-#    - name: Push image for other microservices
-#      run: |
-#        IMAGE_PREFIX=${{ secrets.DOCKER_USERNAME }}
-#        docker tag microservice-linkerd-apache $IMAGE_PREFIX/microservice-linkerd-apache:latest
-#        docker push $IMAGE_PREFIX/microservice-linkerd-apache:latest
-#        docker tag microservice-linkerd-postgres $IMAGE_PREFIX/microservice-linkerd-postgres:latest
-#        docker push $IMAGE_PREFIX/microservice-linkerd-postgres:latest
-#        docker tag microservice-linkerd-shipping:1 $IMAGE_PREFIX/microservice-linkerd-shipping:1
-#        docker push $IMAGE_PREFIX/microservice-linkerd-shipping:1
-#        docker tag microservice-linkerd-invoicing:1 $IMAGE_PREFIX/microservice-linkerd-invoicing:1
-#        docker push $IMAGE_PREFIX/microservice-linkerd-invoicing:1
-#        docker tag microservice-linkerd-order:1 $IMAGE_PREFIX/microservice-linkerd-order:1
-#        docker push $IMAGE_PREFIX/microservice-linkerd-order:1
+    - name: Log into registry
+      run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
+    - name: Push image for other microservices
+      run: |
+        IMAGE_PREFIX=${{ secrets.DOCKER_USERNAME }}
+        docker tag microservice-linkerd-apache $IMAGE_PREFIX/microservice-linkerd-apache:latest
+        docker push $IMAGE_PREFIX/microservice-linkerd-apache:latest
+        docker tag microservice-linkerd-postgres $IMAGE_PREFIX/microservice-linkerd-postgres:latest
+        docker push $IMAGE_PREFIX/microservice-linkerd-postgres:latest
+        docker tag microservice-linkerd-shipping:1 $IMAGE_PREFIX/microservice-linkerd-shipping:1
+        docker push $IMAGE_PREFIX/microservice-linkerd-shipping:1
+        docker tag microservice-linkerd-invoicing:1 $IMAGE_PREFIX/microservice-linkerd-invoicing:1
+        docker push $IMAGE_PREFIX/microservice-linkerd-invoicing:1
+        docker tag microservice-linkerd-order:1 $IMAGE_PREFIX/microservice-linkerd-order:1
+        docker push $IMAGE_PREFIX/microservice-linkerd-order:1
