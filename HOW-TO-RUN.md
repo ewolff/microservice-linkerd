@@ -562,6 +562,20 @@ even more information.
 To remove the fault injection again, just use `kubectl delete -f
 fault-injection.yaml`.
 
+## Timeout
+
+Linkerd adds timeouts to all services. However, the default timeout is
+10 seconds and usually services will answer much quicker. If you use
+`kuberctl apply -f timeout.yaml` a timeout of 3ms will be set for GET
+operations to `/order/feed` on the order microservice. You can now
+create some load with `./load.sh "-X POST
+http://localhost:80/shipping/poll"` . Quite a few of the calls will
+fail now as the order microservice does not respond fast
+enough. `linkerd routes deploy/shipping --to service/order -o wide`
+provides more detailed statistics.
+
+
+
 ## Retries
 
 Use `kubectl apply -f failing-order-service.yaml` to deploy a version
