@@ -532,6 +532,13 @@ feature](https://linkerd.io/2/reference/cli/tap/). For the example,
 you can use e.g. `linkerd tap deploy/order` to log any traffic to the
 order microservice.
 
+## Security
+
+Linkerd encrpyts the communication between the pods. You can verify
+this with `linkerd edges deployment`. It should show that all
+communication is secured. You can also use `linkerd tap deploy` to see
+for each network communication whether it is encrypted with TLS or not.
+
 ## Fault Injection
 
 Linkerd provides feature to split traffic between different
@@ -580,4 +587,3 @@ them. That is different for POSTs.
 You can remove the retries with `kubectl delete -f retry.yaml`. The
 failing microservice can be set to normal with `kubectl apply -f
 microservices.yaml`.
-
