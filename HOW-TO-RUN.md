@@ -603,3 +603,31 @@ them. That is different for POSTs.
 You can remove the retries with `kubectl delete -f retry.yaml`. The
 failing microservice can be set to normal with `kubectl apply -f
 microservices.yaml`.
+
+## Clean Up
+
+* To remove all services and deployments run `kubectl  delete -f microservices.yaml`:
+
+```
+[~/microservice-linkerd/microservice-linkerd-demo] kubectl delete -f microservices.yaml
+deployment.apps "catalog" deleted
+deployment.apps "customer" deleted
+deployment.apps "order" deleted
+service "catalog" deleted
+service "customer" deleted
+service "order" deleted
+virtualservice.networking.linkerd.io "customer" deleted
+virtualservice.networking.linkerd.io "catalog" deleted
+virtualservice.networking.linkerd.io "order" deleted
+```
+
+* Then remove the infrastructure - run `kubectl  delete -f
+  infrastructure.yaml`:
+
+```
+[~/microservice-linkerd/microservice-linkerd-demo]kubectl  delete -f infrastructure.yaml
+deployment.apps "apache" deleted
+service "apache" deleted
+gateway.networking.linkerd.io "microservice-gateway" deleted
+virtualservice.networking.linkerd.io "apache" deleted
+```
