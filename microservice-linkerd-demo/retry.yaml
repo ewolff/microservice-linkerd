@@ -1,0 +1,26 @@
+apiVersion: linkerd.io/v1alpha2
+kind: ServiceProfile
+metadata:
+  creationTimestamp: null
+  name: order.default.svc.cluster.local
+spec:
+  routes:
+  - condition:
+      method: GET
+      pathRegex: /order/feed
+    name: GET /order/feed
+    isRetryable: true
+  - condition:
+      method: GET /order/
+      pathRegex: /order/
+    name: GET /order/
+    isRetryable: true
+  - condition:
+      method: GET /order/
+      pathRegex: /order/[^/]*
+    name: GET /order/{id}
+    isRetryable: true
+  retryBudget:
+    retryRatio: 0.2
+    minRetriesPerSecond: 10
+    ttl: 10s
