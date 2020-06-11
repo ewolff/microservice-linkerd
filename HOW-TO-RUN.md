@@ -508,8 +508,8 @@ stat`. For example, `linkerd stat deploy` gives general metric for all
 deployments. 
 
 `linkerd routes`gives specific information about the metric for a
-specific route between some deployments. For example, ` linkerd routes
-deploy/shipping --to deploy/order` shows the metrics for the
+specific route between some deployments. For example, `linkerd routes
+deploy/shipping --to service/order` shows the metrics for the
 communication between the shipping and the order microservice for
 polling new orders.
 
@@ -531,3 +531,24 @@ Linkerd support logging of web traffic with its [tap
 feature](https://linkerd.io/2/reference/cli/tap/). For the example,
 you can use e.g. `linkerd tap deploy/order` to log any traffic to the
 order microservice.
+
+## Fault Injection
+
+Linkerd provides feature to split traffic between different
+backends. That can be used to inject faults into a route between two
+services. That makes it possible to test the system's resilience.
+`fault-injection.yaml` adds an nginx instance to the system that will
+always respond with an HTTP 500 error code. It also splits the traffic
+between the original service and the nginx instance. That way, 50% of
+all requests hit the nginx service and receive an error.  You can add
+the configuration to the system with `kubectl apply -f
+fault-injection.yaml` . If you make the shipping or invoicing
+microservices poll new information from the order microservice now,
+ends in an error in 50% of the cases.
+
+`linkerd stat deploy` will say that the order deployment still works
+flawlessly. However, `linkerd routes deploy/shipping --to
+service/order` will show that some calls to the service fail.
+
+To remove the fault injection again, just use `kubectl delete -f
+fault-injection.yaml`.
