@@ -513,6 +513,12 @@ deploy/shipping --to service/order` shows the metrics for the
 communication between the shipping and the order microservice for
 polling new orders.
 
+`linkerd top deploy` shows what is currently happening in the
+Kubernetes cluster.
+
+`linkerd tap deploy/order` shows which requests are currently
+handled by the order microservice.
+
 ## Grafana
 
 Prometheus has only very limited dashboards. Therefore linkerd comes
