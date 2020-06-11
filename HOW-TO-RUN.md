@@ -555,7 +555,9 @@ ends in an error in 50% of the cases.
 
 `linkerd stat deploy` will say that the order deployment still works
 flawlessly. However, `linkerd routes deploy/shipping --to
-service/order` will show that some calls to the service fail.
+service/order` will show that some calls to the service fail. However,
+`linkerd routes deploy/shipping --to service/order -o wide` provides
+even more information.
 
 To remove the fault injection again, just use `kubectl delete -f
 fault-injection.yaml`.
