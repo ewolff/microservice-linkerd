@@ -75,7 +75,9 @@ Guide](https://docs.traefik.io/getting-started/install-traefik/)
 explains this in detail. For Kubernetes the [installation using
 Helm](https://docs.traefik.io/getting-started/install-traefik/#use-the-helm-chart)
 might be the best option.  Traefik will listen on port 80 unless you
-changed the port by modifying the value for `ports.web.exposedPort`.
+changed the port by modifying the value for `ports.web.exposedPort` like
+so: `helm install --set ports.web.exposedPort=81 --namespace=traefik traefik traefik/traefik`
+
 
 ## Install Linkerd
 
@@ -637,3 +639,5 @@ service "apache" deleted
 gateway.networking.linkerd.io "microservice-gateway" deleted
 virtualservice.networking.linkerd.io "apache" deleted
 ```
+
+* To remove the Traefik ingress:  `helm uninstall --namespace=traefik traefik`
