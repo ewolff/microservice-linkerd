@@ -582,8 +582,6 @@ fail now as the order microservice does not respond fast
 enough. `linkerd routes deploy/shipping --to service/order -o wide`
 provides more detailed statistics.
 
-
-
 ## Retries
 
 Use `kubectl apply -f failing-order-service.yaml` to deploy a version
