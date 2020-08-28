@@ -9,7 +9,7 @@ balancing. An Apache httpd as a reverse proxy routes the calls to the
 services.
 
 Also the demo uses [linkerd](https://linkerd.io/) for features like
-monitoring, tracing, fault injection, and circuit breaking.
+monitoring, fault injection, and circuit breaking.
 
 This project creates a complete micro service demo system in Docker
 containers. The services are implemented in Java using Spring Boot and
