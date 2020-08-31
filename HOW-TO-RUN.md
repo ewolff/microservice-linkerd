@@ -34,7 +34,9 @@ Kubectl is now configured to use the cluster.
 
 ## Installation Google Cloud
 
-* Go to the [Kubernetes Engine Page](https://console.cloud.google.com/projectselector/kubernetes?_ga=2.66966445.-2058400183.1547494992)
+* Register for [Google Cloud](https://cloud.google.com/).
+
+* Go to the [Kubernetes Engine Page](https://console.cloud.google.com/projectselector/kubernetes)
 
 * Create or select a project for this demo.
 
@@ -62,23 +64,11 @@ SDK](https://cloud.google.com/sdk/docs/quickstarts) and
 * Create a cluster with `gcloud container clusters create
   hello-cluster --num-nodes=3`
   
-* Assign the rights needed for the installation of linkerd to yourself:
+* Assign the rights needed for the installation of Linkerd to yourself:
   `kubectl create clusterrolebinding cluster-admin-binding
   --clusterrole=cluster-admin --user=$(gcloud config get-value
   core/account)`
   
-## Install Traefik Ingress Controller (optional)
-
-To access the services more easily, you can install an Traefik Ingress
-Controller.  The [Traefik Installation
-Guide](https://docs.traefik.io/getting-started/install-traefik/)
-explains this in detail. For Kubernetes the [installation using
-Helm](https://docs.traefik.io/getting-started/install-traefik/#use-the-helm-chart)
-might be the best option.  Traefik will listen on port 80 unless you
-changed the port by modifying the value for `ports.web.exposedPort` like
-so: `helm install --set ports.web.exposedPort=81 --namespace=traefik traefik traefik/traefik`
-
-
 ## Install Linkerd
 
 This and all following steps are either done in the command line
@@ -97,8 +87,18 @@ this command:
 kubectl annotate namespace default linkerd.io/inject=enabled
 ```
 
+## Install Traefik Ingress Controller
 
-## Build the Docker images
+To access the microservices, you must install an Traefik Ingress
+Controller.  The [Traefik Installation
+Guide](https://docs.traefik.io/getting-started/install-traefik/)
+explains this in detail. For Kubernetes the [installation using
+Helm](https://docs.traefik.io/getting-started/install-traefik/#use-the-helm-chart)
+might be the best option.  Traefik will listen on port 80 unless you
+changed the port by modifying the value for `ports.web.exposedPort` like
+so: `helm install --set ports.web.exposedPort=81 --namespace=traefik traefik traefik/traefik`
+
+## Compile Java Code
 
 This step is optional. You can skip this part and
 proceed to "Run the Containers".
@@ -110,7 +110,7 @@ proceed to "Run the Containers".
    Development Kit). A JRE (Java Runtime Environment) is not
    sufficient. After the installation you should be able to execute
    `java` and `javac` on the command line.
-   You need at least Java 10. In the Google Cloud Shell, use `sudo
+   You need at least Java 11. In the Google Cloud Shell, use `sudo
    update-java-alternatives -s java-1.11.0-openjdk-amd64 && export
    JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64` to select Java 11.
 
@@ -140,7 +140,7 @@ package` (macOS / Linux) or `mvnw.cmd clean package` (Windows). This will take a
 [INFO] BUILD SUCCESS
 [INFO] ------------------------------------------------------------------------
 [INFO] Total time: 57.633 s
-[INFO] Finished at: 2017-09-08T09:36:32+02:00
+[INFO] Finished at: 2020-08-08T09:36:32+02:00
 [INFO] Final Memory: 56M/420M
 [INFO] ------------------------------------------------------------------------
 ```
@@ -161,6 +161,9 @@ server runs in the background.
   that case: Remove the directory `repository` in the directory `.m2`
   in your home directory. Note that this means all dependencies will
   be downloaded again.
+
+
+## Build Docker Images
 
 Now the Java code has been compiled. The next step is to create Docker
 images:
@@ -255,8 +258,7 @@ deployment.apps/apache created
 deployment.apps/postgres created
 service/apache created
 service/postgres created
-gateway.networking.linkerd.io/microservice-gateway created
-virtualservice.networking.linkerd.io/apache created
+ingress.extensions/apache created
 ```
 
 
@@ -355,7 +357,7 @@ shipping-5d58798cdd-9jqj8    1/1     Running   0          8m43s
  \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
   '  |____| .__|_| |_|_| |_\__, | / / / /
  =========|_|==============|___/=/_/_/_/
- :: Spring Boot ::        (v2.0.6.RELEASE)
+ :: Spring Boot ::        (v2.3.3..RELEASE)
 
 2019-01-17 16:56:30.909  INFO 6 --- [           main] com.ewolff.microservice.order.OrderApp   : Starting OrderApp v0.0.1-SNAPSHOT on order-cc7f8866-9zbnf with PID 6 (/microservice-linkerd-order-0.0.1-SNAPSHOT.jar started by root in /)
 2019-01-17 16:56:30.918  INFO 6 --- [           main] com.ewolff.microservice.order.OrderApp   : No active profile set, falling back to default profiles: default
@@ -416,15 +418,13 @@ services.
 * Make sure the Ingress gateway works:
 
 ```
-[~/microservice-linkerd/microservice-linkerd-demo] kubectl get service traefik
+[~/microservice-linkerd/microservice-linkerd-demo]kubectl get service traefik -n traefik
 NAME      ...      EXTERNAL-IP   PORT(S)                      AGE
 
 traefik   ...      localhost in     81:32720/TCP,443:32319/TCP   3h9m
 ```
 
-* 
-
-`ingress-url.sh` outputs the URL for the Ingress
+* `ingress-url.sh` outputs the URL for the Ingress
   gateway.
 
 * If you open
@@ -443,7 +443,12 @@ the Linkerd proxies actually work.
 ## Adding another Microservice
 
 There is another microservice in the sub directory
-`microservice-linkerd-bonus`. To add the microservice to your system you
+`microservice-linkerd-bonus`. 
+This microservice shows how you can add another microservice to the
+system without sharing the build infrastructure. So for example you
+can change the Java version or Spring Boot version of this
+microservice without any impact on the other microservices.
+To add the microservice to your system you
 can do the following:
 
 * Change to the directory `microservice-linkerd-bonus` and run `./mvnw clean
@@ -455,15 +460,26 @@ code.
 `microservice-linkerd-bonus`. It builds the Docker images and uploads them into
 the Kubernetes cluster.
 
+* Google Cloud only: Upload the Docker images with `docker-push-gcp.sh`.
+
 * Deploy the microservice with `kubectl apply -f bonus.yaml`.
 
-* You can remove the microservice again with `kubectl delete -f bonus.yaml`.
+* Google Cloud: Use `fix-bonus-gcp.sh` first and then deploy with
+  `kubectl apply -f bonus-gcp.yaml`.
+
+You can also download the images from Dockerhub with
+`fix-bonus-github.sh` and `kubectl apply -f
+bonus-dockerhub.yaml`. That way there is no need to build them
+locally.
+
+You can remove the microservice again with `kubectl delete -f bonus.yaml`.
 
 #### Using the additonal microservice
 
 The bonus microservice is not included in the static web page that
 contains links to the other microservices. However, it can be accessed
-via the Ingress gateway. If the Ingress gateway's URL is
+via the Ingress gateway. `ingress-url.sh` outputs the
+URL of the Ingress gateway. If the Ingress gateway's URL is
 http://192.168.99.127:31380/, you can access the bonus microservice
 at http://192.168.99.127:31380/bonus.
 
@@ -473,6 +489,8 @@ order microservice provides. That field is currently not included in
 the data structure. This shows that adding a new microservice might
 require changes to a common data structure. Such changes might also
 impact the other microservices.
+However, the microservice still works even though the data is not
+present.
 
 ## Prometheus
 
@@ -502,7 +520,7 @@ Linkerd has its own dashboard that provides some information such as
 the deployed resources, namespaces etc. You can use `linkerd
 dashboard` to create a proxy to the dashboard and access it under the
 provided URL. In particular "Top", "Tap", and "Routes" might be
-interesting. Also the Workload includes some metrics and links to
+interesting. Also the "Workload" includes some metrics and links to
 Grafana.
 
 You can get the data also via the command line with `linkerd
@@ -531,7 +549,10 @@ much better graphs and dashboards.
 you can use the URL provided by the command to access Grafana.
 
 You can find information about the deployments in the Linkerd
-Deployment dashboard. 
+Deployment dashboard.
+You can choose one deployment and then click on the Grafana link for
+it.
+
 
 ## Logging
 
@@ -539,6 +560,12 @@ Linkerd support logging of web traffic with its [tap
 feature](https://linkerd.io/2/reference/cli/tap/). For the example,
 you can use e.g. `linkerd tap deploy/order` to log any traffic to the
 order microservice.
+
+But Linkerd can only log the information from the HTTP requests in the
+ logs. While this information is valuable, it is often not sufficient
+ to investigate problems in the microservices. Therefore the
+ microservices themselves must have some information, which can then
+ be accessed via the Kubernetes infrastructure, for example.
 
 ## Security
 
@@ -563,7 +590,7 @@ ends in an error in 50% of the cases.
 
 `linkerd stat deploy` will say that the order deployment still works
 flawlessly. However, `linkerd routes deploy/shipping --to
-service/order` will show that some calls to the service fail. However,
+service/order` will show that some calls to the service fail. 
 `linkerd routes deploy/shipping --to service/order -o wide` provides
 even more information.
 
@@ -574,13 +601,15 @@ fault-injection.yaml`.
 
 Linkerd adds timeouts to all services. However, the default timeout is
 10 seconds and usually services will answer much quicker. If you use
-`kuberctl apply -f timeout.yaml` a timeout of 3ms will be set for GET
+`kubectl apply -f timeout.yaml` a timeout of 3ms will be set for GET
 operations to `/order/feed` on the order microservice. You can now
 create some load with `./load.sh "-X POST
 http://localhost:80/shipping/poll"` . Quite a few of the calls will
 fail now as the order microservice does not respond fast
 enough. `linkerd routes deploy/shipping --to service/order -o wide`
 provides more detailed statistics.
+
+`kubectl delete -f timeout.yaml` removes the timeout.
 
 ## Retries
 
@@ -593,14 +622,15 @@ haven't built the Docker container yourself.
 
 If you access the order microservice's web UI or if you make shipping
 and invoicing poll the order microservice, you will likely receive an
-error.
+error. `linkerd routes deploy/shipping --to service/order` shows the
+statistics about how many calls fail.
 
 With `kubectl apply -f retry.yaml` you can make linkerd retry requests
 to the order service. The configuration adds retries to the
 communication between the microservices as well as the access through
 the Ingress gateway. So polling and the web UI will both work again.
 
-Linkerd uses a retry budget. It allows for at least 10 retures per
+Linkerd uses a retry budget. It allows for at least 10 retries per
 second but at max 20% additional load due to retries. That way retries
 won't overload the system. Also retries are limit to HTTP GET
 operations. GET is ensured to be idempotent so it is safe to retry
