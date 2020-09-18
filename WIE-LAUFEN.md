@@ -551,7 +551,7 @@ zuzugreifen. Insbesondere "Top", "Tap" und "Routes" könnten
 interessant sein. Auch der "Workload" enthält einige Metriken und
 Links zu Grafana.
 
-Sie können die Daten auch über die Kommandozeile mit `linkerd stat`
+Du kannst die Daten auch über die Kommandozeile mit `linkerd stat`
 abrufen. Zum Beispiel gibt `linkerd stat deploy` eine allgemeine
 Metrik für alle Deployments an.
 
@@ -574,12 +574,12 @@ Linkerd außerdem eine Installation von
 [Grafana](https://grafana.com/), das viel bessere Graphen und
 Dashboards anbietet.
 
-`linkerd dashboard` bietet auch Zugang zum Grafana-Dashboard. Sie
-können also die vom Befehl angegebene URL verwenden, um auf Grafana
+`linkerd dashboard` bietet auch Zugang zum Grafana-Dashboard. Du
+kannst also die vom Befehl angegebene URL verwenden, um auf Grafana
 zuzugreifen.
 
-Informationen über die Deployment finden Sie im "Linkerd Deployment
-Dashboard". Sie können ein Deployment auswählen und dann auf den
+Informationen über die Deployment findest Du im "Linkerd Deployment
+Dashboard". Du kannst ein Deployment auswählen und dann auf den
 entsprechenden Link zu Grafana klicken.
 
 ## Logging
@@ -597,9 +597,9 @@ beispielsweise über die Kubernetes-Infrastruktur zugreifbar sind.
 
 ## Security
 
-Linkerd verschlüsselt die Kommunikation zwischen den Pods. Sie können
+Linkerd verschlüsselt die Kommunikation zwischen den Pods. Du kannst
 dies mit `linkerd edges deployment` verifizieren. Es sollte zeigen,
-dass die gesamte Kommunikation gesichert ist. Sie können auch `linkerd
+dass die gesamte Kommunikation gesichert ist. Du kannst auch `linkerd
 tap deploy` verwenden, um für jede Netzwerkkommunikation zu sehen, ob
 sie mit TLS verschlüsselt ist oder nicht.
 
@@ -614,7 +614,7 @@ HTTP-500-Fehlercode antwortet. Es teilt auch den Verkehr zwischen dem
 ursprünglichen Dienst und der nginx-Instanz auf. Auf diese Weise
 treffen 50% aller Anfragen auf den nginx-Dienst und erhalten einen
 Fehler. Du kannst die Konfiguration mit `kubectl apply -f
-fault-injection.yaml` zum System hinzufügen.  Wenn Sie die den
+fault-injection.yaml` zum System hinzufügen.  Wenn Du den
 Shipping- oder Invoicing-Microservice jetzt neue Informationen aus dem
 Order-Microservice abfragen lassen, endet in 50% der Fälle mit einem
 Fehler.
@@ -625,7 +625,7 @@ deploy/shipping --to service/order` zeigen, dass einige Aufrufe an den
 Dienst fehlschlagen.  Noch mehr Informationen erhälst Du mit `linkerd
 routes deploy/shipping --to service/order -o wide` .
 
-Um die Fehlerinjektion wieder zu entfernen, verwenden Sie einfach
+Um die Fehlerinjektion wieder zu entfernen, verwendest Du einfach
 `kubectl delete -f fault-injection.yaml`.
 
 ## Timeout
@@ -634,7 +634,7 @@ Linkerd fügt allen Services Timeouts hinzu. Der Standard-Timeout
 beträgt jedoch 10 Sekunden, und normalerweise antworten die Services
 viel schneller. Mit `kubectl apply -f timeout.yaml` wird ein Timeout
 von 3 ms für GET-Operationen auf `/order/feed` für den
-Order-Microservice gesetzt. Sie können jetzt mit `./load.sh"-X POST
+Order-Microservice gesetzt. Du kannst jetzt mit `./load.sh"-X POST
 http://localhost:80/shipping/poll"` Last erzeugen. Eine ganze Reihe
 von Aufrufen wird jetzt fehlschlagen, da der Order-Microservice nicht
 schnell genug reagiert. `linkerd routes deploy/shipping --to
